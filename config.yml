@@ -1,0 +1,5 @@
+listen:
+  address: ":9549"
+  metricspath: /metrics
+raspberry:
+  vcgencmd: /usr/bin/vcgencmd
