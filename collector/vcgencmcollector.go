@@ -13,6 +13,8 @@ type VcGenCmdCollector struct {
 	CoreClock               *prometheus.Desc
 	ArmClock                *prometheus.Desc
 	EmmcClock               *prometheus.Desc
+	CpuMemory               *prometheus.Desc
+	GpuMemory               *prometheus.Desc
 }
 
 func (VcGenCmdCollector) Describe(channel chan<- *prometheus.Desc) {
@@ -26,6 +28,8 @@ func (VcGenCmdCollector) Describe(channel chan<- *prometheus.Desc) {
 	channel <- collector.CoreClock
 	channel <- collector.ArmClock
 	channel <- collector.EmmcClock
+	channel <- collector.CpuMemory
+	channel <- collector.GpuMemory
 }
 
 func (VcGenCmdCollector) Collect(channel chan<- prometheus.Metric) {
@@ -36,9 +40,11 @@ func (VcGenCmdCollector) Collect(channel chan<- prometheus.Metric) {
 	channel <- getVoltage(collector.SdramPhysicalVoltage, SdramPhysicalVoltage)
 	channel <- getVoltage(collector.SdramInputOutputVoltage, SdramInputOutputVoltage)
 	channel <- getVoltage(collector.SdramControllerVoltage, SdramControllerVoltage)
-	channel <- getClock(collector.CoreClock, CoreClock)
+	channel <- getClock(collector.CoreClock, GpuClock)
 	channel <- getClock(collector.ArmClock, ArmClock)
 	channel <- getClock(collector.EmmcClock, EmmcClock)
+	channel <- getMemory(collector.CpuMemory, CpuMemory)
+	channel <- getMemory(collector.GpuMemory, GpuMemory)
 }
 
 var _ prometheus.Collector = &VcGenCmdCollector{}
@@ -81,20 +87,32 @@ func NewVcGenCmdCollector() *VcGenCmdCollector {
 			nil,
 		),
 		CoreClock: prometheus.NewDesc(
-			prometheus.BuildFQName(namespace, subsystem, "core_clock"),
-			"Clock of the core in Hz",
+			prometheus.BuildFQName(namespace, subsystem, "gpu_clock"),
+			"Clock speed of the GPU in Hz",
 			nil,
 			nil,
 		),
 		ArmClock: prometheus.NewDesc(
-			prometheus.BuildFQName(namespace, subsystem, "arm_clock"),
-			"Clock of the ARM CPU in Hz",
+			prometheus.BuildFQName(namespace, subsystem, "cpu_clock"),
+			"Clock speed of the ARM CPU in Hz",
 			nil,
 			nil,
 		),
 		EmmcClock: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, subsystem, "emmc_clock"),
-			"Clock of the external MMC in Hz",
+			"Clock speed of the SD card in Hz",
+			nil,
+			nil,
+		),
+		CpuMemory: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, subsystem, "cpu_memory"),
+			"Memory for the CPU in Megabytes",
+			nil,
+			nil,
+		),
+		GpuMemory: prometheus.NewDesc(
+			prometheus.BuildFQName(namespace, subsystem, "gpu_memory"),
+			"Memory for the GPU in Megabytes",
 			nil,
 			nil,
 		),

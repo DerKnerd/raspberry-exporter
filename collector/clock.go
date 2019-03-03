@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	CoreClock string = "core"
+	GpuClock  string = "core"
 	EmmcClock string = "emmc"
 	ArmClock  string = "arm"
 )
