@@ -3,11 +3,9 @@ package exporter
 import (
 	"../collector"
 	"github.com/prometheus/client_golang/prometheus"
-	"sync"
 )
 
 type Exporter struct {
-	mutex      sync.Mutex
 	collectors []prometheus.Collector
 }
 
