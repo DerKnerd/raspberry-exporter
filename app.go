@@ -30,7 +30,5 @@ func main() {
 
 	if err := http.ListenAndServe(listenAddress, nil); err != nil {
 		log.Fatalf("Cannot start Raspberry PI exporter: %s", err)
-	} else {
-		log.Printf("Started Raspberry PI exporter on %q", listenAddress)
 	}
 }
