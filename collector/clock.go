@@ -1,10 +1,11 @@
 package collector
 
 import (
-	"../utils"
-	"github.com/prometheus/client_golang/prometheus"
 	"regexp"
 	"strconv"
+
+	"github.com/derknerd/raspberry-exporter/utils"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (

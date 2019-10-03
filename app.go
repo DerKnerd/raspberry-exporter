@@ -1,13 +1,14 @@
 package main
 
 import (
-	"./exporter"
-	"./utils"
 	"flag"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
+
+	"github.com/derknerd/raspberry-exporter/exporter"
+	"github.com/derknerd/raspberry-exporter/utils"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {

@@ -1,12 +1,13 @@
 package collector
 
 import (
-	"../utils"
-	"github.com/prometheus/client_golang/prometheus"
 	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/derknerd/raspberry-exporter/utils"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func getCoreTemp(collector VcGenCmdCollector) prometheus.Metric {
