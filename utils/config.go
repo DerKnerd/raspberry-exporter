@@ -47,18 +47,21 @@ func GetVcGenCmd() string {
 }
 
 func ParseConfig() {
+	configFile := flag.String("config.file", "", "Path to configuration file.")
 	flag.Parse()
 
-	if configFileFlag := flag.Lookup("--config.file"); configFileFlag != nil {
-		configFile := configFileFlag.Value.String()
+	setDefaultConfig()
+	if *configFile == "" {
+		return
+	}
 
-		if configData, err := ioutil.ReadFile(configFile); err != nil {
-			setDefaultConfig()
-		} else if err = yaml.Unmarshal(configData, config); err != nil {
-			setDefaultConfig()
-		}
-	} else {
-		setDefaultConfig()
+	configData, err := ioutil.ReadFile(*configFile)
+	if err != nil {
+		return
+	}
+
+	if err := yaml.Unmarshal(configData, config); err != nil {
+		return
 	}
 }
 

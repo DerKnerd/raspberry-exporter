@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
 
@@ -12,7 +11,6 @@ import (
 )
 
 func main() {
-	flag.Parse()
 	utils.ParseConfig()
 
 	exp := exporter.New()
