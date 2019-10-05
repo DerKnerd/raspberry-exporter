@@ -14,8 +14,8 @@ const (
 	ArmClock  string = "arm"
 )
 
-func getClock(desc *prometheus.Desc, device string) prometheus.Metric {
-	clock, err := utils.ExecuteVcGen("measure_clock", device)
+func (c *VcGenCmdCollector) getClock(desc *prometheus.Desc, device string) prometheus.Metric {
+	clock, err := utils.ExecuteVcGen(c.VcGenCmd,"measure_clock", device)
 
 	if err != nil {
 		return prometheus.NewInvalidMetric(desc, err)

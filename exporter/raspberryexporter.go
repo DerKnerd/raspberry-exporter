@@ -1,7 +1,6 @@
 package exporter
 
 import (
-	"github.com/derknerd/raspberry-exporter/collector"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -9,18 +8,15 @@ type Exporter struct {
 	collectors []prometheus.Collector
 }
 
-func New() Exporter {
-	var exporter = Exporter{}
-	exporter.collectors = []prometheus.Collector{
-		collector.NewVcGenCmdCollector(),
+func New(collectors ...prometheus.Collector) Exporter {
+	return Exporter{
+		collectors: collectors,
 	}
-
-	return exporter
 }
 
 func (exporter Exporter) Describe(channel chan<- *prometheus.Desc) {
-	for _, cc := range exporter.collectors {
-		cc.Describe(channel)
+	for _, c := range exporter.collectors {
+		c.Describe(channel)
 	}
 }
 
@@ -29,5 +25,3 @@ func (exporter Exporter) Collect(channel chan<- prometheus.Metric) {
 		c.Collect(channel)
 	}
 }
-
-var _ prometheus.Collector = &Exporter{}

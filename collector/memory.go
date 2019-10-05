@@ -13,8 +13,8 @@ const (
 	GpuMemory string = "gpu"
 )
 
-func getMemory(desc *prometheus.Desc, device string) prometheus.Metric {
-	memory, err := utils.ExecuteVcGen("get_mem", device)
+func (c *VcGenCmdCollector) getMemory(desc *prometheus.Desc, device string) prometheus.Metric {
+	memory, err := utils.ExecuteVcGen(c.VcGenCmd, "get_mem", device)
 
 	if err != nil {
 		return prometheus.NewInvalidMetric(desc, err)

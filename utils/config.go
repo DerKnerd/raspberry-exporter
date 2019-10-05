@@ -1,8 +1,9 @@
 package utils
 
 import (
+	"errors"
 	"flag"
-	"io/ioutil"
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -13,66 +14,64 @@ const (
 	defaultMetricsPath   = "/metrics"
 )
 
-type localConfig struct {
-	Listen    listen    `yaml:"listen"`
-	Raspberry raspberry `yaml:"raspberry"`
+type LocalConfig struct {
+	Listen    ListenConfig    `yaml:"listen"`
+	Raspberry RaspberryConfig `yaml:"raspberry"`
 }
 
-type listen struct {
+type ListenConfig struct {
 	Address     string `yaml:"address"`
 	MetricsPath string `yaml:"metricspath"`
 }
 
-type raspberry struct {
+type RaspberryConfig struct {
 	VcGenCmd string `yaml:"vcgencmd"`
 }
 
-var config *localConfig = nil
-
-func Config() *localConfig {
-	if config == nil {
-		ParseConfig()
-	}
-	return config
-}
-
-func GetVcGenCmd() string {
-	if _, err := os.Stat("/opt/vc/bin/vcgencmd"); !os.IsNotExist(err) {
-		return "/opt/vc/bin/vcgencmd"
-	} else if _, err := os.Stat("/usr/bin/vcgencmd"); !os.IsNotExist(err) {
-		return "/usr/bin/vcgencmd"
-	} else {
-		panic("Could not find vcgencmd please install the raspberry pi toolchain")
-	}
-}
-
-func ParseConfig() {
+func ParseConfig() (*LocalConfig, error) {
 	configFile := flag.String("config.file", "", "Path to configuration file.")
 	flag.Parse()
 
-	setDefaultConfig()
 	if *configFile == "" {
-		return
+		return defaultConfig()
 	}
 
-	configData, err := ioutil.ReadFile(*configFile)
+	file, err := os.Open(*configFile)
 	if err != nil {
-		return
+		return nil, fmt.Errorf("can not open config file: %s", err)
 	}
 
-	if err := yaml.Unmarshal(configData, config); err != nil {
-		return
+	config := &LocalConfig{}
+	if err := yaml.NewDecoder(file).Decode(config); err != nil {
+		return nil, fmt.Errorf("error decoding config file %q: %s", *configFile, err)
+	}
+
+	return config, nil
+}
+
+func getVcGenCmd() (string, error) {
+	if _, err := os.Stat("/opt/vc/bin/vcgencmd"); !os.IsNotExist(err) {
+		return "/opt/vc/bin/vcgencmd", nil
+	} else if _, err := os.Stat("/usr/bin/vcgencmd"); !os.IsNotExist(err) {
+		return "/usr/bin/vcgencmd", nil
+	} else {
+		return "", errors.New("could not find vcgencmd: please install the raspberry pi toolchain")
 	}
 }
 
-func setDefaultConfig() {
-	config = &localConfig{
-		Raspberry: raspberry{
-			VcGenCmd: GetVcGenCmd(),
+func defaultConfig() (*LocalConfig, error) {
+	vcGenCmd, err := getVcGenCmd()
+	if err != nil {
+		return nil, err
+	}
+
+	return &LocalConfig{
+		Raspberry: RaspberryConfig{
+			VcGenCmd: vcGenCmd,
 		},
-		Listen: listen{
+		Listen: ListenConfig{
 			Address:     defaultListenAddress,
 			MetricsPath: defaultMetricsPath,
 		},
-	}
+	}, nil
 }

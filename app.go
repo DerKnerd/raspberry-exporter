@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/derknerd/raspberry-exporter/collector"
 	"github.com/derknerd/raspberry-exporter/exporter"
 	"github.com/derknerd/raspberry-exporter/utils"
 	"github.com/prometheus/client_golang/prometheus"
@@ -11,15 +12,21 @@ import (
 )
 
 func main() {
-	utils.ParseConfig()
+	log.SetFlags(0)
 
-	exp := exporter.New()
+	config, err := utils.ParseConfig()
+	if err != nil {
+		log.Fatalf("Error loading configuration: %s", err)
+	}
+
+	c := collector.NewVcGenCmdCollector(config.Raspberry.VcGenCmd)
+	exp := exporter.New(c)
 
 	prometheus.MustRegister(exp)
 
-	listenAddress := utils.Config().Listen.Address
+	listenAddress := config.Listen.Address
 
-	http.Handle(utils.Config().Listen.MetricsPath, promhttp.Handler())
+	http.Handle(config.Listen.MetricsPath, promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, utils.Config().Listen.MetricsPath, http.StatusMovedPermanently)
 	})
