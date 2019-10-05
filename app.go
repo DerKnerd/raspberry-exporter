@@ -28,7 +28,7 @@ func main() {
 
 	http.Handle(config.Listen.MetricsPath, promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, utils.Config().Listen.MetricsPath, http.StatusMovedPermanently)
+		http.Redirect(w, r, config.Listen.MetricsPath, http.StatusFound)
 	})
 
 	log.Printf("Starting Raspberry PI exporter on %q", listenAddress)
