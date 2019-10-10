@@ -1,7 +1,7 @@
 package exporter
 
 import (
-	"../collector"
+	"github.com/derknerd/raspberry-exporter/collector"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

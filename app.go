@@ -1,13 +1,14 @@
 package main
 
 import (
-	"./exporter"
-	"./utils"
 	"flag"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
+
+	"github.com/derknerd/raspberry-exporter/exporter"
+	"github.com/derknerd/raspberry-exporter/utils"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -29,7 +30,5 @@ func main() {
 
 	if err := http.ListenAndServe(listenAddress, nil); err != nil {
 		log.Fatalf("Cannot start Raspberry PI exporter: %s", err)
-	} else {
-		log.Printf("Started Raspberry PI exporter on %q", listenAddress)
 	}
 }
