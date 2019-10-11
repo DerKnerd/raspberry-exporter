@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/derknerd/raspberry-exporter/collector"
-	"github.com/derknerd/raspberry-exporter/exporter"
 	"github.com/derknerd/raspberry-exporter/utils"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -20,9 +19,7 @@ func main() {
 	}
 
 	c := collector.NewVcGenCmdCollector(config.Raspberry.VcGenCmd)
-	exp := exporter.New(c)
-
-	prometheus.MustRegister(exp)
+	prometheus.MustRegister(c)
 
 	listenAddress := config.Listen.Address
 
