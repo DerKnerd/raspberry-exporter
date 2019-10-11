@@ -14,6 +14,10 @@ const (
 	ArmClock  string = "arm"
 )
 
+var (
+	clockRegex = regexp.MustCompile(`frequency\(\d*\)=|(\n)|(\r)`)
+)
+
 func (c *VcGenCmdCollector) getClock(desc *prometheus.Desc, device string) prometheus.Metric {
 	clock, err := utils.ExecuteVcGen(c.VcGenCmd,"measure_clock", device)
 
@@ -21,7 +25,7 @@ func (c *VcGenCmdCollector) getClock(desc *prometheus.Desc, device string) prome
 		return prometheus.NewInvalidMetric(desc, err)
 	}
 
-	clock = regexp.MustCompile(`frequency\(\d*\)=|(\n)|(\r)`).ReplaceAllString(clock, "")
+	clock = clockRegex.ReplaceAllString(clock, "")
 
 	clockFloat, err := strconv.ParseFloat(clock, 64)
 

@@ -10,6 +10,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+var (
+	temperatureRegex = regexp.MustCompile(`(temp=)|('C)|(\n)|(\r)`)
+)
+
 func (c *VcGenCmdCollector) getCoreTemp() prometheus.Metric {
 	coreTempFromSys, err := ioutil.ReadFile("/sys/class/thermal/thermal_zone0/temp")
 	var coreTemp string
@@ -19,7 +23,7 @@ func (c *VcGenCmdCollector) getCoreTemp() prometheus.Metric {
 		if coreTemp, err = utils.ExecuteVcGen(c.VcGenCmd, "measure_temp"); err != nil {
 			return prometheus.NewInvalidMetric(coreTempDesc, err)
 		} else {
-			coreTemp = regexp.MustCompile(`(temp=)|('C)|(\n)|(\r)`).ReplaceAllString(coreTemp, "")
+			coreTemp = temperatureRegex.ReplaceAllString(coreTemp, "")
 			method = "vcgen"
 		}
 	} else {
