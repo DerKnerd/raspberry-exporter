@@ -10,16 +10,20 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func getCoreTemp(collector VcGenCmdCollector) prometheus.Metric {
+var (
+	temperatureRegex = regexp.MustCompile(`(temp=)|('C)|(\n)|(\r)`)
+)
+
+func (c *VcGenCmdCollector) getCoreTemp() prometheus.Metric {
 	coreTempFromSys, err := ioutil.ReadFile("/sys/class/thermal/thermal_zone0/temp")
 	var coreTemp string
 	method := "file"
 
 	if err != nil {
-		if coreTemp, err = utils.ExecuteVcGen("measure_temp"); err != nil {
-			return prometheus.NewInvalidMetric(collector.CoreTemp, err)
+		if coreTemp, err = utils.ExecuteVcGen(c.VcGenCmd, "measure_temp"); err != nil {
+			return prometheus.NewInvalidMetric(coreTempDesc, err)
 		} else {
-			coreTemp = regexp.MustCompile(`(temp=)|('C)|(\n)|(\r)`).ReplaceAllString(coreTemp, "")
+			coreTemp = temperatureRegex.ReplaceAllString(coreTemp, "")
 			method = "vcgen"
 		}
 	} else {
@@ -30,7 +34,7 @@ func getCoreTemp(collector VcGenCmdCollector) prometheus.Metric {
 	coreTempFloat, err := strconv.ParseFloat(coreTemp, 64)
 
 	if err != nil {
-		return prometheus.NewInvalidMetric(collector.CoreTemp, err)
+		return prometheus.NewInvalidMetric(coreTempDesc, err)
 	}
 
 	if method == "file" {
@@ -38,7 +42,7 @@ func getCoreTemp(collector VcGenCmdCollector) prometheus.Metric {
 	}
 
 	return prometheus.MustNewConstMetric(
-		collector.CoreTemp,
+		coreTempDesc,
 		prometheus.GaugeValue,
 		coreTempFloat,
 	)

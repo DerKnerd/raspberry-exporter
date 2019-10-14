@@ -4,7 +4,7 @@ import (
 	"os/exec"
 )
 
-func ExecuteVcGen(command string, parameters ...string) (string, error) {
+func ExecuteVcGen(vcGenCmd, command string, parameters ...string) (string, error) {
 	args := make([]string, len(parameters)+1)
 	args = append(args, command)
 
@@ -12,7 +12,7 @@ func ExecuteVcGen(command string, parameters ...string) (string, error) {
 		args = append(args, parameter)
 	}
 
-	return Execute(Config().Raspberry.VcGenCmd, args...)
+	return Execute(vcGenCmd, args...)
 }
 
 func Execute(appname string, args ...string) (string, error) {

@@ -13,14 +13,18 @@ const (
 	GpuMemory string = "gpu"
 )
 
-func getMemory(desc *prometheus.Desc, device string) prometheus.Metric {
-	memory, err := utils.ExecuteVcGen("get_mem", device)
+var (
+	memoryRegex = regexp.MustCompile(`(gpu=)|(arm=)|(M)|(\n)|(\r)`)
+)
+
+func (c *VcGenCmdCollector) getMemory(desc *prometheus.Desc, device string) prometheus.Metric {
+	memory, err := utils.ExecuteVcGen(c.VcGenCmd, "get_mem", device)
 
 	if err != nil {
 		return prometheus.NewInvalidMetric(desc, err)
 	}
 
-	memory = regexp.MustCompile(`(gpu=)|(arm=)|(M)|(\n)|(\r)`).ReplaceAllString(memory, "")
+	memory = memoryRegex.ReplaceAllString(memory, "")
 	memoryFloat, err := strconv.ParseFloat(memory, 64)
 
 	if err != nil {

@@ -1,29 +1,31 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
 
-	"github.com/derknerd/raspberry-exporter/exporter"
+	"github.com/derknerd/raspberry-exporter/collector"
 	"github.com/derknerd/raspberry-exporter/utils"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
-	flag.Parse()
-	utils.ParseConfig()
+	log.SetFlags(0)
 
-	exp := exporter.New()
+	config, err := utils.ParseConfig()
+	if err != nil {
+		log.Fatalf("Error loading configuration: %s", err)
+	}
 
-	prometheus.MustRegister(exp)
+	c := collector.NewVcGenCmdCollector(config.Raspberry.VcGenCmd)
+	prometheus.MustRegister(c)
 
-	listenAddress := utils.Config().Listen.Address
+	listenAddress := config.Listen.Address
 
-	http.Handle(utils.Config().Listen.MetricsPath, promhttp.Handler())
+	http.Handle(config.Listen.MetricsPath, promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, utils.Config().Listen.MetricsPath, http.StatusMovedPermanently)
+		http.Redirect(w, r, config.Listen.MetricsPath, http.StatusFound)
 	})
 
 	log.Printf("Starting Raspberry PI exporter on %q", listenAddress)

@@ -15,14 +15,18 @@ const (
 	SdramPhysicalVoltage    string = "sdram_p"
 )
 
-func getVoltage(desc *prometheus.Desc, device string) prometheus.Metric {
-	voltage, err := utils.ExecuteVcGen("measure_volts", device)
+var (
+	voltageRegex = regexp.MustCompile(`(volt=)|(V)|(\n)|(\r)`)
+)
+
+func (c *VcGenCmdCollector) getVoltage(desc *prometheus.Desc, device string) prometheus.Metric {
+	voltage, err := utils.ExecuteVcGen(c.VcGenCmd, "measure_volts", device)
 
 	if err != nil {
 		return prometheus.NewInvalidMetric(desc, err)
 	}
 
-	voltage = regexp.MustCompile(`(volt=)|(V)|(\n)|(\r)`).ReplaceAllString(voltage, "")
+	voltage = voltageRegex.ReplaceAllString(voltage, "")
 
 	voltageFloat, err := strconv.ParseFloat(voltage, 64)
 
