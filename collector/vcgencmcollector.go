@@ -66,6 +66,30 @@ var (
 		nil,
 		nil,
 	)
+	throttledUnderVoltageDetectedDesc = prometheus.NewDesc(
+		prefix+"throttled_under_voltage_detected",
+		"Under-voltage detected",
+		nil,
+		nil,
+	)
+	throttledArmFrequencyCappedDesc = prometheus.NewDesc(
+		prefix+"throttled_arm_freq_capped",
+		"Arm frequency capped",
+		nil,
+		nil,
+	)
+	throttledCurrentlyThrottled = prometheus.NewDesc(
+		prefix+"throttled_currently_throttled",
+		"Currently throttled",
+		nil,
+		nil,
+	)
+	throttledSoftTemperatureLimitActive = prometheus.NewDesc(
+		prefix+"throttled_soft_temperature_limit_active",
+		"Soft temperature limit active",
+		nil,
+		nil,
+	)
 )
 
 type VcGenCmdCollector struct {
@@ -83,6 +107,10 @@ func (c *VcGenCmdCollector) Describe(channel chan<- *prometheus.Desc) {
 	channel <- emmcClockDesc
 	channel <- cpuMemoryDesc
 	channel <- gpuMemoryDesc
+	channel <- throttledUnderVoltageDetectedDesc
+	channel <- throttledArmFrequencyCappedDesc
+	channel <- throttledCurrentlyThrottled
+	channel <- throttledSoftTemperatureLimitActive
 }
 
 func (c *VcGenCmdCollector) Collect(channel chan<- prometheus.Metric) {
@@ -96,6 +124,10 @@ func (c *VcGenCmdCollector) Collect(channel chan<- prometheus.Metric) {
 	channel <- c.getClock(emmcClockDesc, EmmcClock)
 	channel <- c.getMemory(cpuMemoryDesc, CpuMemory)
 	channel <- c.getMemory(gpuMemoryDesc, GpuMemory)
+	channel <- c.getThrottledAtBit(throttledUnderVoltageDetectedDesc, 0, Throttled)
+	channel <- c.getThrottledAtBit(throttledArmFrequencyCappedDesc, 1, Throttled)
+	channel <- c.getThrottledAtBit(throttledCurrentlyThrottled, 2, Throttled)
+	channel <- c.getThrottledAtBit(throttledSoftTemperatureLimitActive, 3, Throttled)
 }
 
 func NewVcGenCmdCollector(vcGenCmd string) *VcGenCmdCollector {
