@@ -5,14 +5,14 @@ import (
 	"log"
 	"strings"
 
+	"github.com/derknerd/raspberry-exporter/utils"
 	"github.com/prometheus/client_golang/prometheus"
-    "github.com/derknerd/raspberry-exporter/utils"
 )
 
 func getModel(cfg utils.RaspberryConfig) string {
-    if cfg.Model != "" {
-        return cfg.Model
-    }
+	if cfg.Model != "" {
+		return cfg.Model
+	}
 	data, err := ioutil.ReadFile("/proc/cpuinfo")
 	if err != nil {
 		log.Printf("failed to read /proc/cpuinfo: %s", err)
@@ -28,33 +28,32 @@ func getModel(cfg utils.RaspberryConfig) string {
 			return strings.TrimSpace(parts[1])
 		}
 	}
-    return "unknown"
+	return "unknown"
 }
 
-
 var (
-	prefix       = "pi_vcgencmd_"
-    coreTempDesc *prometheus.Desc
-    coreVoltageDesc *prometheus.Desc
-    sdramControllerVoltageDesc *prometheus.Desc
-    sdramInputOutputVoltageDesc *prometheus.Desc
-    sdramPhysicalVoltageDesc *prometheus.Desc
-    coreClockDesc *prometheus.Desc
-    armClockDesc *prometheus.Desc
-    emmcClockDesc *prometheus.Desc
-    cpuMemoryDesc *prometheus.Desc
-    gpuMemoryDesc *prometheus.Desc
-    throttledUnderVoltageDetectedDesc *prometheus.Desc
-    throttledArmFrequencyCappedDesc *prometheus.Desc
-    throttledCurrentlyThrottled *prometheus.Desc
-    throttledSoftTemperatureLimitActive *prometheus.Desc
+	prefix                              = "pi_vcgencmd_"
+	coreTempDesc                        *prometheus.Desc
+	coreVoltageDesc                     *prometheus.Desc
+	sdramControllerVoltageDesc          *prometheus.Desc
+	sdramInputOutputVoltageDesc         *prometheus.Desc
+	sdramPhysicalVoltageDesc            *prometheus.Desc
+	coreClockDesc                       *prometheus.Desc
+	armClockDesc                        *prometheus.Desc
+	emmcClockDesc                       *prometheus.Desc
+	cpuMemoryDesc                       *prometheus.Desc
+	gpuMemoryDesc                       *prometheus.Desc
+	throttledUnderVoltageDetectedDesc   *prometheus.Desc
+	throttledArmFrequencyCappedDesc     *prometheus.Desc
+	throttledCurrentlyThrottled         *prometheus.Desc
+	throttledSoftTemperatureLimitActive *prometheus.Desc
 )
 
 func initDescriptions(model string) {
 
-    constLabels := prometheus.Labels {
-        "model": model,
-    }
+	constLabels := prometheus.Labels{
+		"model": model,
+	}
 
 	coreTempDesc = prometheus.NewDesc(
 		prefix+"core_temp",
@@ -186,8 +185,8 @@ func (c *VcGenCmdCollector) Collect(channel chan<- prometheus.Metric) {
 }
 
 func NewVcGenCmdCollector(cfg utils.RaspberryConfig) *VcGenCmdCollector {
-    model := getModel(cfg)
-    initDescriptions(model)
+	model := getModel(cfg)
+	initDescriptions(model)
 	return &VcGenCmdCollector{
 		VcGenCmd:         cfg.VcGenCmd,
 		DisableThrottled: cfg.DisableThrottled,
