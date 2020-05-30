@@ -25,7 +25,9 @@ type ListenConfig struct {
 }
 
 type RaspberryConfig struct {
-	VcGenCmd string `yaml:"vcgencmd"`
+	VcGenCmd         string `yaml:"vcgencmd"`
+	DisableThrottled bool   `yaml:"disable_throttled"`
+    Model            string `yaml:"model"`
 }
 
 func ParseConfig() (*LocalConfig, error) {
@@ -67,7 +69,8 @@ func defaultConfig() (*LocalConfig, error) {
 
 	return &LocalConfig{
 		Raspberry: RaspberryConfig{
-			VcGenCmd: vcGenCmd,
+			VcGenCmd:         vcGenCmd,
+			DisableThrottled: false,
 		},
 		Listen: ListenConfig{
 			Address:     defaultListenAddress,

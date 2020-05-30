@@ -3,3 +3,7 @@ listen:
   metricspath: /metrics
 raspberry:
   vcgencmd: /usr/bin/vcgencmd
+  # for old vcgencmd you might want to set this to true:
+  disable_throttled: false
+  # when autodetection of the raspberry model fails, set this here:
+  # model: "Raspberry Pi 1 B"
