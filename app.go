@@ -18,7 +18,7 @@ func main() {
 		log.Fatalf("Error loading configuration: %s", err)
 	}
 
-	c := collector.NewVcGenCmdCollector(config.Raspberry.VcGenCmd)
+	c := collector.NewVcGenCmdCollector(config.Raspberry)
 	prometheus.MustRegister(c)
 
 	listenAddress := config.Listen.Address
